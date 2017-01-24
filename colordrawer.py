@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from tkinter import *
 print("Imports complete")
 
 
@@ -27,6 +28,7 @@ class ColorDrawer:
         self.cap = cv2.VideoCapture(0)
         self.h,self.s,self.v = 80,50,50
         self.show_rect = False
+        self.show_help = True
         self.char = 0
         self.ready = True
         self.going = True
@@ -35,6 +37,8 @@ class ColorDrawer:
         self.colors = [(181,158,89),(0, 255, 0)]
         self.color = self.colors[0]
         self.threshold_area = 500
+        self.help = cv2.imread("helpimg.png")
+        self.scale = .6
 
     def keycheck(self, key):
         """Performs the function assigned to KEY"""
@@ -72,6 +76,10 @@ class ColorDrawer:
             self.show_rect = not self.show_rect
         elif self.key == ord('s'):
             self.cycle()
+        elif self.key == ord('w'):
+            if self.show_help:
+                cv2.destroyWindow("Help")
+            self.show_help = not self.show_help
 
     def cycle(self):
         """Cycles through the colors of the lines"""
@@ -84,6 +92,11 @@ class ColorDrawer:
         """Displays all of the windows"""
         if self.show_rect:
             cv2.rectangle(self.frame, (200, 200), (270,270), (0,255,0), 3)
+        if self.show_help:
+            cv2.imshow("Help", self.help)
+
+        # The following windows are for debugging purposes, uncomment if necessary.
+        """
         cv2.imshow("blur", self.blurred)
         cv2.moveWindow("blur", 670, 520)
         cv2.imshow("hsv", self.hsv)
@@ -91,11 +104,13 @@ class ColorDrawer:
         cv2.imshow("Filtered", self.img)
         cv2.imshow("Frame",self.frame)
         cv2.moveWindow("Frame", 720, 80)
+        """
+        cv2.imshow("Frame",self.frame)
         self.key = cv2.waitKey(5) & 255
 
     def remake(self, frame):
         """Resizes and flips a window for viewability"""
-        frame = cv2.resize(frame, (0, 0), fx=0.4, fy=0.4)
+        frame = cv2.resize(frame, (0, 0), fx=self.scale, fy=self.scale)
         frame = cv2.flip(frame, 1)
         return frame
 
